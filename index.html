@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grenfell Tower Curriculum Matching Activity</title>
+    <style>
+        :root {
+            --red-border: #da291c;
+            --blue-border: #0070c0;
+            --correct-green: #d4edda;
+            --correct-border: #28a745;
+            --incorrect-red: #f8d7da;
+            --incorrect-border: #dc3545;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1, p.intro {
+            text-align: center;
+            color: #333;
+        }
+
+        .game-container {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .column {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .column-header {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        /* Draggable Items (Left Side) */
+        .draggable-item {
+            background: white;
+            border: 3px solid var(--red-border);
+            padding: 15px;
+            border-radius: 4px;
+            cursor: grab;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .draggable-item:active {
+            cursor: grabbing;
+            transform: scale(0.98);
+        }
+
+        .draggable-item.matched {
+            opacity: 0.5;
+            cursor: default;
+            background-color: #e2e2e2;
+            border-color: #ccc;
+            text-decoration: line-through;
+        }
+
+        /* Drop Zones (Right Side) */
+        .drop-zone {
+            background: white;
+            border: 3px solid var(--blue-border);
+            padding: 15px;
+            border-radius: 4px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* Feedback States */
+        .drop-zone.correct {
+            background-color: var(--correct-green);
+            border-color: var(--correct-border);
+            color: #155724;
+        }
+        
+        .drop-zone.correct::after {
+            content: '✔ Match';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--correct-border);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .drop-zone.incorrect {
+            animation: shake 0.5s;
+            background-color: var(--incorrect-red);
+            border-color: var(--incorrect-border);
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Matching Pairs: Grenfell Tower & Curriculum</h1>
+    <p class="intro">Drag the Grenfell fact (Red) to the correct Curriculum requirement (Blue).</p>
+
+    <div class="game-container">
+        
+        <div class="column">
+            <div class="column-header">Grenfell Facts</div>
+            
+            <div class="draggable-item" draggable="true" id="drag1" data-match="target-dt">
+                The flammability testing of the cladding materials which failed to predict the rapid spread of the fire.
+            </div>
+
+            <div class="draggable-item" draggable="true" id="drag2" data-match="target-money">
+                The repeated concerns raised by the Grenfell Action Group regarding fire safety that were overlooked by the Tenant Management Organisation.
+            </div>
+
+            <div class="draggable-item" draggable="true" id="drag3" data-match="target-history">
+                Locating the disaster within the historical context of North Kensington and social housing development.
+            </div>
+
+            <div class="draggable-item" draggable="true" id="drag4" data-match="target-law">
+                The breach of the residents' right to life and safe housing.
+            </div>
+
+            <div class="draggable-item" draggable="true" id="drag5" data-match="target-community">
+                The community-led response and the formation of support hubs by local residents immediately after the disaster.
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="column-header">Curriculum Requirements</div>
+
+            <div class="drop-zone" id="target-dt">
+                Investigate and analyse the work of past and present professionals and companies in the area of design and technology in order to help inform their own ideas. (GCSE Design and Technology)
+            </div>
+
+            <div class="drop-zone" id="target-money">
+                Income and expenditure, credit and debt, insurance, savings and pensions, financial products and services, and how public money is raised and spent. (KS4 Citizenship)
+            </div>
+
+            <div class="drop-zone" id="target-law">
+                The legal system in the UK, different sources of law and how the law helps society deal with complex problems. (KS4 Citizenship)
+            </div>
+
+            <div class="drop-zone" id="target-history">
+                A study of an aspect of history or a site dating from a period beyond 1066 that is significant in the locality. (KS2 History)
+            </div>
+
+            <div class="drop-zone" id="target-community">
+                The roles played by public institutions and voluntary groups in society, and the ways in which citizens work together to improve their communities. (KS3 Citizenship)
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const draggables = document.querySelectorAll('.draggable-item');
+        const dropZones = document.querySelectorAll('.drop-zone');
+
+        // Add Event Listeners to Draggable Items
+        draggables.forEach(draggable => {
+            draggable.addEventListener('dragstart', dragStart);
+        });
+
+        // Add Event Listeners to Drop Zones
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', dragOver);
+            zone.addEventListener('drop', drop);
+            zone.addEventListener('dragenter', dragEnter);
+            zone.addEventListener('dragleave', dragLeave);
+        });
+
+        function dragStart(e) {
+            // Store the ID of the dragged element and its intended match
+            e.dataTransfer.setData('text/plain', e.target.id);
+            e.dataTransfer.setData('match-id', e.target.getAttribute('data-match'));
+            e.dataTransfer.effectAllowed = "move";
+        }
+
+        function dragOver(e) {
+            // Allow dropping
+            e.preventDefault(); 
+        }
+
+        function dragEnter(e) {
+            e.preventDefault();
+            // Optional: Highlight zone on hover
+            if(!e.target.closest('.drop-zone').classList.contains('correct')) {
+                e.target.closest('.drop-zone').style.backgroundColor = "#f0f8ff";
+            }
+        }
+
+        function dragLeave(e) {
+            // Remove hover highlight
+            if(!e.target.closest('.drop-zone').classList.contains('correct') && 
+               !e.target.closest('.drop-zone').classList.contains('incorrect')) {
+                e.target.closest('.drop-zone').style.backgroundColor = "white";
+            }
+        }
+
+        function drop(e) {
+            e.preventDefault();
+            
+            // Get the specific drop zone (handle case where user drops on child text)
+            const dropZone = e.target.closest('.drop-zone');
+            
+            // If already matched, ignore
+            if (dropZone.classList.contains('correct')) return;
+
+            // Get data from dragged item
+            const draggedId = e.dataTransfer.getData('text/plain');
+            const requiredMatch = e.dataTransfer.getData('match-id');
+            const draggedElement = document.getElementById(draggedId);
+
+            // Check if the drop zone ID matches the required match ID
+            if (dropZone.id === requiredMatch) {
+                // CORRECT MATCH
+                handleCorrect(dropZone, draggedElement);
+            } else {
+                // INCORRECT MATCH
+                handleIncorrect(dropZone);
+            }
+        }
+
+        function handleCorrect(zone, draggedItem) {
+            // Visual feedback for zone
+            zone.classList.add('correct');
+            zone.style.backgroundColor = ""; // Clear inline style from dragEnter
+            
+            // Visual feedback for dragged item (disable it)
+            draggedItem.classList.add('matched');
+            draggedItem.setAttribute('draggable', 'false');
+            
+            // Optional: Move the text inside or keep it separate. 
+            // Here we keep them separate but visually linked by state.
+        }
+
+        function handleIncorrect(zone) {
+            // Visual feedback
+            zone.classList.add('incorrect');
+            
+            // Remove the red class after animation completes
+            setTimeout(() => {
+                zone.classList.remove('incorrect');
+                zone.style.backgroundColor = "white"; // Reset to white
+            }, 600);
+        }
+    </script>
+</body>
+</html>
