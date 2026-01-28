@@ -20,6 +20,8 @@
             margin: 0 auto;
             padding: 20px;
             background-color: #f9f9f9;
+            /* Prevent full page scroll bounce on mobile for better drag experience */
+            overscroll-behavior-y: contain; 
         }
 
         h1, p.intro {
@@ -30,17 +32,18 @@
         .game-container {
             display: flex;
             gap: 40px;
-            justify-content: center;
-            flex-wrap: wrap;
+            /* vital: stretches the shorter column to match the taller one */
+            align-items: stretch; 
             margin-top: 30px;
+            /* Set a min-height to ensure decent spacing on large screens */
+            min-height: 600px; 
         }
 
         .column {
-            flex: 1;
-            min-width: 300px;
+            flex: 1; /* Both columns take equal width */
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px; /* Uniform gap between items */
         }
 
         .column-header {
@@ -48,23 +51,46 @@
             text-align: center;
             margin-bottom: 10px;
             font-size: 1.1em;
+            flex: 0 0 auto; /* Header doesn't stretch */
+        }
+
+        /* --- Shared Styles for Uniformity --- */
+        .card-style {
+            padding: 20px;
+            border-radius: 6px;
+            /* Flex layout INSIDE the card to center text vertically */
+            display: flex;
+            align-items: center; 
+            justify-content: flex-start; /* Keep text left aligned for readability */
+            
+            /* Vital: Makes every card share the column height equally */
+            flex: 1; 
+            width: 100%; /* Fill column width */
+            box-sizing: border-box; /* Ensure padding doesn't affect width */
+            font-size: 0.95rem;
+            line-height: 1.4;
         }
 
         /* Draggable Items (Left Side) */
         .draggable-item {
             background: white;
             border: 3px solid var(--red-border);
-            padding: 15px;
-            border-radius: 4px;
             cursor: grab;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             transition: all 0.2s ease;
             user-select: none;
         }
+        
+        /* Apply shared layout style */
+        .draggable-item {
+            /* Inherit common flex properties */
+            @extend .card-style; 
+        }
 
         .draggable-item:active {
             cursor: grabbing;
-            transform: scale(0.98);
+            transform: scale(0.99);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         .draggable-item.matched {
@@ -79,11 +105,6 @@
         .drop-zone {
             background: white;
             border: 3px solid var(--blue-border);
-            padding: 15px;
-            border-radius: 4px;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
             transition: all 0.3s ease;
             position: relative;
         }
@@ -98,14 +119,15 @@
         .drop-zone.correct::after {
             content: '✔ Match';
             position: absolute;
-            top: -10px;
+            top: -12px;
             right: -10px;
             background: var(--correct-border);
             color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
+            padding: 4px 10px;
+            border-radius: 12px;
             font-size: 0.8em;
             font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .drop-zone.incorrect {
@@ -126,6 +148,13 @@
         @media (max-width: 768px) {
             .game-container {
                 flex-direction: column;
+                /* On mobile, we don't want them to stretch endlessly, just stack */
+                min-height: auto;
+            }
+            .card-style {
+                /* On mobile, let content define height */
+                flex: none; 
+                min-height: 80px;
             }
         }
     </style>
@@ -140,23 +169,23 @@
         <div class="column" id="left-col">
             <div class="column-header">Grenfell Facts</div>
             
-            <div class="draggable-item" draggable="true" id="drag1" data-match="target-dt">
+            <div class="draggable-item card-style" draggable="true" id="drag1" data-match="target-dt">
                 The flammability testing of the cladding materials which failed to predict the rapid spread of the fire.
             </div>
 
-            <div class="draggable-item" draggable="true" id="drag2" data-match="target-money">
+            <div class="draggable-item card-style" draggable="true" id="drag2" data-match="target-money">
                 The repeated concerns raised by the Grenfell Action Group regarding fire safety that were overlooked by the Tenant Management Organisation.
             </div>
 
-            <div class="draggable-item" draggable="true" id="drag3" data-match="target-history">
+            <div class="draggable-item card-style" draggable="true" id="drag3" data-match="target-history">
                 Locating the disaster within the historical context of North Kensington and social housing development.
             </div>
 
-            <div class="draggable-item" draggable="true" id="drag4" data-match="target-law">
+            <div class="draggable-item card-style" draggable="true" id="drag4" data-match="target-law">
                 The breach of the residents' right to life and safe housing.
             </div>
 
-            <div class="draggable-item" draggable="true" id="drag5" data-match="target-community">
+            <div class="draggable-item card-style" draggable="true" id="drag5" data-match="target-community">
                 The community-led response and the formation of support hubs by local residents immediately after the disaster.
             </div>
         </div>
@@ -164,23 +193,23 @@
         <div class="column" id="right-col">
             <div class="column-header">Curriculum Requirements</div>
 
-            <div class="drop-zone" id="target-dt">
+            <div class="drop-zone card-style" id="target-dt">
                 Investigate and analyse the work of past and present professionals and companies in the area of design and technology in order to help inform their own ideas. (GCSE Design and Technology)
             </div>
 
-            <div class="drop-zone" id="target-money">
+            <div class="drop-zone card-style" id="target-money">
                 Income and expenditure, credit and debt, insurance, savings and pensions, financial products and services, and how public money is raised and spent. (KS4 Citizenship)
             </div>
 
-            <div class="drop-zone" id="target-law">
+            <div class="drop-zone card-style" id="target-law">
                 The legal system in the UK, different sources of law and how the law helps society deal with complex problems. (KS4 Citizenship)
             </div>
 
-            <div class="drop-zone" id="target-history">
+            <div class="drop-zone card-style" id="target-history">
                 A study of an aspect of history or a site dating from a period beyond 1066 that is significant in the locality. (KS2 History)
             </div>
 
-            <div class="drop-zone" id="target-community">
+            <div class="drop-zone card-style" id="target-community">
                 The roles played by public institutions and voluntary groups in society, and the ways in which citizens work together to improve their communities. (KS3 Citizenship)
             </div>
         </div>
@@ -190,7 +219,9 @@
         // --- RANDOMIZER LOGIC ---
         function shuffleElements(containerId, itemClass) {
             const container = document.getElementById(containerId);
-            const items = Array.from(container.getElementsByClassName(itemClass));
+            // Get all items but exclude the header
+            const header = container.querySelector('.column-header');
+            const items = Array.from(container.querySelectorAll('.' + itemClass));
 
             // Fisher-Yates Shuffle Algorithm
             for (let i = items.length - 1; i > 0; i--) {
@@ -198,8 +229,9 @@
                 [items[i], items[j]] = [items[j], items[i]];
             }
 
-            // Re-append items to the container in the new random order
-            // Note: appendChild moves the element if it already exists, so we don't need to clear first
+            // Clear container (except header) and re-append
+            // A safer way is to just append them in the new order, 
+            // appendChild moves existing nodes.
             items.forEach(item => container.appendChild(item));
         }
 
@@ -234,22 +266,26 @@
 
         function dragEnter(e) {
             e.preventDefault();
-            if(!e.target.closest('.drop-zone').classList.contains('correct')) {
-                e.target.closest('.drop-zone').style.backgroundColor = "#f0f8ff";
+            const zone = e.target.closest('.drop-zone');
+            if(zone && !zone.classList.contains('correct')) {
+                zone.style.backgroundColor = "#f0f8ff";
             }
         }
 
         function dragLeave(e) {
-            if(!e.target.closest('.drop-zone').classList.contains('correct') && 
-               !e.target.closest('.drop-zone').classList.contains('incorrect')) {
-                e.target.closest('.drop-zone').style.backgroundColor = "white";
+            const zone = e.target.closest('.drop-zone');
+            if(zone && !zone.classList.contains('correct') && 
+               !zone.classList.contains('incorrect')) {
+                zone.style.backgroundColor = "white";
             }
         }
 
         function drop(e) {
             e.preventDefault();
             const dropZone = e.target.closest('.drop-zone');
-            if (dropZone.classList.contains('correct')) return;
+            
+            // Safety check
+            if (!dropZone || dropZone.classList.contains('correct')) return;
 
             const draggedId = e.dataTransfer.getData('text/plain');
             const requiredMatch = e.dataTransfer.getData('match-id');
@@ -264,7 +300,8 @@
 
         function handleCorrect(zone, draggedItem) {
             zone.classList.add('correct');
-            zone.style.backgroundColor = "";
+            zone.style.backgroundColor = ""; // Reset inline style
+            
             draggedItem.classList.add('matched');
             draggedItem.setAttribute('draggable', 'false');
         }
