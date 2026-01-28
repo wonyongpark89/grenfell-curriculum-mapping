@@ -137,7 +137,7 @@
 
     <div class="game-container">
         
-        <div class="column">
+        <div class="column" id="left-col">
             <div class="column-header">Grenfell Facts</div>
             
             <div class="draggable-item" draggable="true" id="drag1" data-match="target-dt">
@@ -161,7 +161,7 @@
             </div>
         </div>
 
-        <div class="column">
+        <div class="column" id="right-col">
             <div class="column-header">Curriculum Requirements</div>
 
             <div class="drop-zone" id="target-dt">
@@ -187,15 +187,36 @@
     </div>
 
     <script>
+        // --- RANDOMIZER LOGIC ---
+        function shuffleElements(containerId, itemClass) {
+            const container = document.getElementById(containerId);
+            const items = Array.from(container.getElementsByClassName(itemClass));
+
+            // Fisher-Yates Shuffle Algorithm
+            for (let i = items.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [items[i], items[j]] = [items[j], items[i]];
+            }
+
+            // Re-append items to the container in the new random order
+            // Note: appendChild moves the element if it already exists, so we don't need to clear first
+            items.forEach(item => container.appendChild(item));
+        }
+
+        // Run Shuffle on Page Load
+        window.addEventListener('DOMContentLoaded', () => {
+            shuffleElements('left-col', 'draggable-item');
+            shuffleElements('right-col', 'drop-zone');
+        });
+
+        // --- GAME LOGIC ---
         const draggables = document.querySelectorAll('.draggable-item');
         const dropZones = document.querySelectorAll('.drop-zone');
 
-        // Add Event Listeners to Draggable Items
         draggables.forEach(draggable => {
             draggable.addEventListener('dragstart', dragStart);
         });
 
-        // Add Event Listeners to Drop Zones
         dropZones.forEach(zone => {
             zone.addEventListener('dragover', dragOver);
             zone.addEventListener('drop', drop);
@@ -204,27 +225,21 @@
         });
 
         function dragStart(e) {
-            // Store the ID of the dragged element and its intended match
             e.dataTransfer.setData('text/plain', e.target.id);
             e.dataTransfer.setData('match-id', e.target.getAttribute('data-match'));
             e.dataTransfer.effectAllowed = "move";
         }
 
-        function dragOver(e) {
-            // Allow dropping
-            e.preventDefault(); 
-        }
+        function dragOver(e) { e.preventDefault(); }
 
         function dragEnter(e) {
             e.preventDefault();
-            // Optional: Highlight zone on hover
             if(!e.target.closest('.drop-zone').classList.contains('correct')) {
                 e.target.closest('.drop-zone').style.backgroundColor = "#f0f8ff";
             }
         }
 
         function dragLeave(e) {
-            // Remove hover highlight
             if(!e.target.closest('.drop-zone').classList.contains('correct') && 
                !e.target.closest('.drop-zone').classList.contains('incorrect')) {
                 e.target.closest('.drop-zone').style.backgroundColor = "white";
@@ -233,49 +248,32 @@
 
         function drop(e) {
             e.preventDefault();
-            
-            // Get the specific drop zone (handle case where user drops on child text)
             const dropZone = e.target.closest('.drop-zone');
-            
-            // If already matched, ignore
             if (dropZone.classList.contains('correct')) return;
 
-            // Get data from dragged item
             const draggedId = e.dataTransfer.getData('text/plain');
             const requiredMatch = e.dataTransfer.getData('match-id');
             const draggedElement = document.getElementById(draggedId);
 
-            // Check if the drop zone ID matches the required match ID
             if (dropZone.id === requiredMatch) {
-                // CORRECT MATCH
                 handleCorrect(dropZone, draggedElement);
             } else {
-                // INCORRECT MATCH
                 handleIncorrect(dropZone);
             }
         }
 
         function handleCorrect(zone, draggedItem) {
-            // Visual feedback for zone
             zone.classList.add('correct');
-            zone.style.backgroundColor = ""; // Clear inline style from dragEnter
-            
-            // Visual feedback for dragged item (disable it)
+            zone.style.backgroundColor = "";
             draggedItem.classList.add('matched');
             draggedItem.setAttribute('draggable', 'false');
-            
-            // Optional: Move the text inside or keep it separate. 
-            // Here we keep them separate but visually linked by state.
         }
 
         function handleIncorrect(zone) {
-            // Visual feedback
             zone.classList.add('incorrect');
-            
-            // Remove the red class after animation completes
             setTimeout(() => {
                 zone.classList.remove('incorrect');
-                zone.style.backgroundColor = "white"; // Reset to white
+                zone.style.backgroundColor = "white";
             }, 600);
         }
     </script>
